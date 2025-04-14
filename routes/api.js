@@ -1,49 +1,31 @@
-/*
-*
-*
-*       Complete the API routing below
-*
-*
-*/
-
 'use strict';
 
-var expect = require('chai').expect;
-var ConvertHandler = require('../controllers/convertHandler.js');
+const expect = require('chai').expect;
+const ConvertHandler = require('../controllers/convertHandler.js');
 
 module.exports = function (app) {
   
-  var convertHandler = new ConvertHandler();
+  let convertHandler = new ConvertHandler();
 
-  app.route('/api/convert')
-    .get(function (req, res){
-      var input = req.query.input;
-      var initNum = convertHandler.getNum(input);
-      var initUnit = convertHandler.getUnit(input);
-      var returnNum = convertHandler.convert(initNum, initUnit);
-      var returnUnit = convertHandler.getReturnUnit(initUnit);
-      var toString = convertHandler.getString(initNum, initUnit, returnNum, returnUnit);
+  app.route('/api/convert').get((req, res) => {
+
+    let {input} = req.query
+
+    if(input){
+        let num = convertHandler.getNum(input)
+        let unit = convertHandler.getUnit(input)
       
-      if(initNum === 'invalid number' && initUnit === 'invalid unit'){
-        res.json('invalid number and unit')
-      }
-    
-      if(initNum === 'invalid number'){
-        res.json('invalid number')
-      }  
-    
-      if(initUnit === 'invalid unit'){
-        res.json('invalid unit')
-      }  
-    
-      let responseObject = {}
-      responseObject['initNum'] = initNum
-      responseObject['initUnit'] = initUnit
-      responseObject['returnNum'] = returnNum
-      responseObject['returnUnit'] = returnUnit
-      responseObject['string'] = toString
-    
-      res.json(responseObject)
-    });
-    
+        if(num === 'invalid number' && unit === 'invalid unit') 
+          return res.json('invalid number and unit')
+        if(num === 'invalid number' && unit !== 'invalid unit')
+          return res.json('invalid number')
+        if(num !== 'invalid number' && unit === 'invalid unit')
+          return res.json('invalid unit')
+
+        let returnNum = convertHandler.convert(num,unit)
+        let returnUnit = convertHandler.getReturnUnit(unit)
+
+        return res.json(convertHandler.getString(num, unit, returnNum, returnUnit))
+    }
+  })
 };
